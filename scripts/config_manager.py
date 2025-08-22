@@ -48,22 +48,42 @@ class ConfigManager:
             # 查找配置文件
             self.config_file = self._find_config_file()
         
+        defaults = self._get_default_config()
         if self.config_file and os.path.exists(self.config_file):
             try:
                 with open(self.config_file, 'r', encoding='utf-8') as f:
-                    self.config_data = json.load(f)
+                    loaded = json.load(f)
+                # 深度合并：以 loaded 覆盖 defaults
+                self.config_data = self._merge_config(defaults, loaded)
                 self.logger.info(f"配置文件加载成功: {self.config_file}")
             except Exception as e:
                 self.logger.error(f"配置文件加载失败: {e}")
-                self.config_data = self._get_default_config()
+                self.config_data = defaults
         else:
             self.logger.info("使用默认配置")
-            self.config_data = self._get_default_config()
+            self.config_data = defaults
         
         # 应用环境变量覆盖
         self._apply_environment_overrides()
         
         return self.config_data
+
+    def _merge_config(self, base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
+        """深度合并配置，override 覆盖 base。"""
+        result = base.copy()
+        for key, value in (override or {}).items():
+            if isinstance(value, dict) and isinstance(result.get(key), dict):
+                result[key] = self._merge_config(result[key], value)
+            else:
+                result[key] = value
+        # 维护派生扁平键，确保 Analyzer 可用
+        result["api_base"] = result.get("api_base") or result.get("api", {}).get("base_url")
+        result["base_url"] = result.get("base_url") or "https://www.liblib.art"
+        result["page_size"] = result.get("page_size") or result.get("scraping", {}).get("page_size", 24)
+        result["max_workers"] = result.get("max_workers") or result.get("scraping", {}).get("max_workers", 4)
+        if not result.get("car_keywords"):
+            result["car_keywords"] = result.get("tags", {}).get("enabled", [])
+        return result
     
     def _find_config_file(self) -> Optional[str]:
         """查找配置文件
@@ -87,7 +107,7 @@ class ConfigManager:
     
     def _get_default_config(self) -> Dict[str, Any]:
         """获取默认配置"""
-        return {
+        cfg = {
             "api": {
                 "base_url": "https://api2.liblib.art",
                 "timeout": 30,
@@ -114,7 +134,7 @@ class ConfigManager:
                 "concurrent_downloads": 5,
                 "image_formats": ["jpg", "png", "webp"],
                 "retry_times": 3,
-                "skip_existing": true
+                "skip_existing": True
             },
             "storage": {
                 "output_dir": "liblib_analysis_output",
@@ -124,16 +144,25 @@ class ConfigManager:
                 "logs_dir": "logs"
             },
             "analysis": {
-                "include_charts": true,
+                "include_charts": True,
                 "report_format": "markdown",
                 "language": "zh"
             },
             "logging": {
                 "level": "INFO",
-                "file_logging": true,
-                "console_logging": true
+                "file_logging": True,
+                "console_logging": True
             }
         }
+
+        # 兼容 Analyzer 直接访问的扁平键
+        cfg["api_base"] = cfg["api"]["base_url"]
+        cfg["base_url"] = "https://www.liblib.art"
+        cfg["page_size"] = cfg["scraping"]["page_size"]
+        cfg["max_workers"] = cfg["scraping"]["max_workers"]
+        cfg["car_keywords"] = cfg["tags"]["enabled"]
+
+        return cfg
     
     def _apply_environment_overrides(self):
         """应用环境变量覆盖"""

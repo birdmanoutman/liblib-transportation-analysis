@@ -269,3 +269,6 @@ tmp/
 user_config.json
 local_settings.py
 personal_config.py
+
+*archive/*
+archive/

@@ -1,4 +1,4 @@
-# 🚗 Liblib汽车交通模型分析系统 - T13&T14完整版
+# 🚗 Liblib汽车交通模型分析系统
 
 > 一键完成：采集→清洗→分析→出图（中文）的完整分析流水线
 
@@ -34,14 +34,14 @@ liblib-transportation-analysis/
 ├── 📁 data/                       # 数据文件
 ├── 📄 save_and_analyze_collected_data.py  # 静态数据分析器
 ├── 📄 run_complete_analysis.py   # 🆕 一键运行脚本
-└── 📄 README_T13_T14_COMPLETE.md # 本文档
+└── 📄 README_COMPLETE.md # 本文档
 ```
 
 ## 🚀 快速开始
 
 ### 环境要求
 
-- **Python**: 3.7+
+- **Python**: 3.10+
 - **操作系统**: Windows 10+, macOS 10.14+, Ubuntu 18.04+
 - **内存**: 建议 4GB+
 - **存储**: 建议 2GB+ 可用空间
