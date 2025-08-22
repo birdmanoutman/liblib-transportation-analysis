@@ -1,8 +1,0 @@
-{
-  "url": "https://example.com/image3_mock_model_1_3.jpg",
-  "local_path": "data/test_t12/images/image3_mock_model_1_3.jpg",
-  "status": "success",
-  "file_size": 1048576,
-  "download_time": "2025-08-22T16:45:50.643963",
-  "checksum": "mock_checksum_12345"
-}
