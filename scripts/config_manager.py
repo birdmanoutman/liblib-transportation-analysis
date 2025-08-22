@@ -187,6 +187,7 @@ class ConfigManager:
         env_mappings = {
             "LIBLIB_API_BASE_URL": ("api", "base_url"),
             "LIBLIB_TIMEOUT": ("api", "timeout"),
+            "LIBLIB_COOKIE": ("api", "cookie"),
             "LIBLIB_MAX_WORKERS": ("scraping", "max_workers"),
             "LIBLIB_OUTPUT_DIR": ("storage", "output_dir"),
             "LIBLIB_CONCURRENT_DOWNLOADS": ("download", "concurrent_downloads"),

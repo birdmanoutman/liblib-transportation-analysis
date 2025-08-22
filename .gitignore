@@ -276,3 +276,4 @@ car_models_complete/
 data/
 data/*
 test_output/
+*.png

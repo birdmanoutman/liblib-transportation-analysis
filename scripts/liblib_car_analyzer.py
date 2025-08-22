@@ -167,6 +167,9 @@ class LiblibCarModelsAnalyzer:
             'Referer': 'https://www.liblib.art/',
             'Origin': 'https://www.liblib.art'
         })
+        cookie = self.config_manager.get('api.cookie')
+        if cookie:
+            self.session.headers.update({'Cookie': cookie})
         
         # 设置超时和重试配置
         self.timeout = self.config_manager.get('api.timeout', 30)
@@ -261,16 +264,35 @@ class LiblibCarModelsAnalyzer:
         
         try:
             async with async_playwright() as p:
-                browser = await p.chromium.launch(headless=True)
-                page = await browser.new_page()
+                browser = await p.chromium.launch(headless=True, args=[
+                    "--disable-blink-features=AutomationControlled",
+                    "--no-sandbox",
+                    "--disable-dev-shm-usage",
+                ])
+                context = await browser.new_context(
+                    user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    viewport={"width": 1366, "height": 900},
+                    java_script_enabled=True,
+                    bypass_csp=True,
+                )
+                page = await context.new_page()
+                await page.set_extra_http_headers({
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                })
                 
-                # 访问页面
-                await page.goto(f"{self.config['base_url']}/models?category=汽车交通")
-                await page.wait_for_load_state('networkidle')
+                target_url = f"{self.config['base_url']}/models?category=汽车交通"
+                await page.goto(target_url, wait_until='domcontentloaded', timeout=60000)
+                # 等待网格元素渲染，最多30秒
+                try:
+                    await page.wait_for_selector("div[role='gridcell']", timeout=30000)
+                except Exception:
+                    self.logger.warning("未检测到网格元素，尝试继续滚动提取")
                 
                 # 滚动页面加载更多内容
                 models = await self._scroll_and_extract(page)
                 
+                await context.close()
                 await browser.close()
                 self.logger.info(f"浏览器采集完成，共获取{len(models)}个模型")
                 return models
@@ -434,6 +456,11 @@ class LiblibCarModelsAnalyzer:
                         detailed_models.append(detail)
                 except Exception as e:
                     self.logger.error(f"获取模型详情失败: {e}")
+        
+        # 如果无法获取详情，但已获取基础模型列表，则回退为基础模型输出
+        if not detailed_models and all_models:
+            self.logger.warning("未能获取模型详情，使用基础模型列表作为回退结果")
+            return all_models
         
         self.logger.info(f"综合采集完成，共获取{len(detailed_models)}个详细模型")
         return detailed_models
