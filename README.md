@@ -39,7 +39,7 @@ liblib-transportation-analysis/
 └── 📄 README.md                   # 项目说明
 ```
 
-📖 **详细结构说明**: 查看 [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
+📖 **详细结构说明**: 查看 [PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)
 
 ## 🚀 快速开始
 
