@@ -31,6 +31,9 @@ Pillow>=8.0.0
 aiohttp>=3.7.0
 asyncio-throttle>=1.0.0
 
+# 异步数据库
+aiomysql>=0.1.0
+
 # 数据验证
 pydantic>=1.8.0
 
