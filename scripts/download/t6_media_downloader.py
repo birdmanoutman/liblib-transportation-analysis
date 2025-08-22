@@ -203,8 +203,9 @@ class MediaDownloader:
     
     def setup_logging(self):
         """设置日志"""
+        log_level = getattr(self.config, 'log_level', 'INFO')
         logging.basicConfig(
-            level=getattr(logging, self.config.log_level.upper()),
+            level=getattr(logging, log_level.upper()),
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
             handlers=[
                 logging.FileHandler('t6_media_downloader.log'),
