@@ -1,0 +1,24 @@
+{
+  "id": "mock_model_1_10",
+  "title": "测试汽车模型详情 mock_model_1_10",
+  "author": "测试作者",
+  "description": "这是一个测试用的汽车模型详情数据",
+  "modelType": "LORA F.1",
+  "stats": {
+    "views": "1000",
+    "likes": "50",
+    "downloads": "25"
+  },
+  "images": [
+    "https://example.com/image1_mock_model_1_10.jpg",
+    "https://example.com/image2_mock_model_1_10.jpg",
+    "https://example.com/image3_mock_model_1_10.jpg"
+  ],
+  "tags": [
+    "汽车",
+    "设计",
+    "模型"
+  ],
+  "category": "汽车设计",
+  "timestamp": "2025-08-22T16:45:49.925409"
+}
