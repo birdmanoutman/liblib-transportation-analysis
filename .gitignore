@@ -1,8 +1,12 @@
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# C extensions
 *.so
+
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -16,16 +20,113 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
 
-# Virtual environments
-venv/
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
 env/
+venv/
 ENV/
-.venv/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
 
 # IDE
 .vscode/
@@ -43,82 +144,128 @@ ENV/
 ehthumbs.db
 Thumbs.db
 
-# Logs
+# Project specific
+# 数据文件目录
+data/raw/*.json
+data/raw/*.log
+data/raw/*.md
+data/processed/
+data/images/
+data/analysis/
+
+# 输出目录
+output/
+results/
+reports/
+
+# 临时文件
+temp/
+tmp/
+*.tmp
+
+# 日志文件
 *.log
 logs/
 
-# Large data files
-*.json
-!package.json
-!package-lock.json
-!tsconfig.json
-!webpack.config.js
+# 缓存文件
+.cache/
+cache/
 
-# Image files (usually large)
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.tiff
-*.webp
-*.svg
+# 配置文件（包含敏感信息）
+config.json
+secrets.json
+.env.local
 
-# Video files
+# 大文件
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# 图片文件（可选，如果不想版本控制图片）
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# *.bmp
+# *.tiff
+
+# 视频文件
 *.mp4
 *.avi
 *.mov
 *.wmv
 *.flv
-*.mkv
 
-# Audio files
+# 音频文件
 *.mp3
 *.wav
 *.flac
 *.aac
 
-# Archive files
-*.zip
-*.rar
-*.7z
-*.tar
-*.gz
+# 文档文件（可选）
+# *.pdf
+# *.doc
+# *.docx
+# *.xls
+# *.xlsx
 
-# Database files
+# 备份文件
+*.bak
+*.backup
+*.old
+
+# 测试覆盖率报告
+htmlcov/
+.coverage
+.coverage.*
+
+# 性能分析文件
+*.prof
+*.lprof
+
+# 内存转储文件
+*.dump
+*.dmp
+
+# 系统文件
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# 编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 包管理文件
+node_modules/
+vendor/
+
+# 构建产物
+build/
+dist/
+target/
+
+# 数据库文件
 *.db
 *.sqlite
 *.sqlite3
 
-# Temporary files
-*.tmp
-*.temp
-*.bak
-*.backup
+# 压缩包
+*.zip
+*.tar.gz
+*.rar
+*.7z
 
-# Analysis output files
-*_analysis.json
-*_report.md
-*_summary.md
+# 临时目录
+temp/
+tmp/
+.tmp/
 
-# Scraped data
-car_models_complete/
-liblib_car_models_images/
-existing_data_analysis/
-
-# Jupyter notebooks
-*.ipynb
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-
-# Coverage reports
-htmlcov/
-.coverage
-.coverage.*
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
+# 用户特定文件
+user_config.json
+local_settings.py
+personal_config.py

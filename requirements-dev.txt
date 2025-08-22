@@ -1,0 +1,60 @@
+# 开发环境依赖
+
+# 测试框架
+pytest>=6.0.0
+pytest-cov>=2.10.0
+pytest-mock>=3.6.0
+pytest-asyncio>=0.15.0
+pytest-xdist>=2.3.0
+
+# 代码质量
+black>=21.0.0
+flake8>=3.8.0
+mypy>=0.800
+isort>=5.9.0
+bandit>=1.6.0
+
+# 类型检查
+types-requests>=2.25.0
+types-PyYAML>=5.4.0
+
+# 文档生成
+sphinx>=4.0.0
+sphinx-rtd-theme>=0.5.0
+
+# 性能分析
+memory-profiler>=0.58.0
+line-profiler>=3.3.0
+
+# 调试工具
+ipdb>=0.13.0
+ipython>=7.0.0
+
+# 代码覆盖率
+coverage>=5.5.0
+
+# 预提交钩子
+pre-commit>=2.15.0
+
+# 依赖管理
+pip-tools>=6.0.0
+
+# 虚拟环境
+virtualenv>=20.0.0
+
+# 包管理
+build>=0.5.0
+twine>=3.4.0
+
+# 代码格式化
+autopep8>=1.5.0
+yapf>=0.30.0
+
+# 导入排序
+isort>=5.9.0
+
+# 安全检查
+safety>=1.10.0
+
+# 许可证检查
+liccheck>=0.4.0
