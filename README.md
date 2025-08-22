@@ -20,7 +20,7 @@
 
 ```
 liblib-transportation-analysis/
-├── 📁 scripts/                    # 脚本文件
+├── 📁 src/                        # 脚本文件
 │   ├── liblib_car_analyzer.py    # 🚀 主分析器脚本
 │   ├── 📁 scraping/              # 数据采集脚本
 │   ├── 📁 download/              # 数据下载脚本
@@ -86,19 +86,47 @@ make type-check
 
 ```bash
 # 运行完整分析
-python scripts/liblib_car_analyzer.py --all
+python src/liblib_car_analyzer.py --all
 
 # 仅采集数据
-python scripts/liblib_car_analyzer.py --collect
+python src/liblib_car_analyzer.py --collect
 
 # 仅下载图片
-python scripts/liblib_car_analyzer.py --download-images
+python src/liblib_car_analyzer.py --download-images
 
 # 仅分析数据
-python scripts/liblib_car_analyzer.py --analyze
+python src/liblib_car_analyzer.py --analyze
+
+# 使用MCP工具采集数据（推荐）
+python src/scraping/liblib_mcp_collector.py
 
 # 查看帮助
-python scripts/liblib_car_analyzer.py --help
+python src/liblib_car_analyzer.py --help
+```
+
+### 📊 数据采集示例
+
+最近成功采集到的汽车交通相关模型数据：
+
+```json
+{
+  "title": "汽车新车车辆真实拍摄 bz3X",
+  "type": "LORA",
+  "version": "F.1",
+  "downloads": "5.6k",
+  "likes": "7",
+  "collections": "253",
+  "exclusive": true,
+  "author": "AIGC_black",
+  "category": "汽车交通"
+}
+```
+
+**采集统计**:
+- 总模型数: 6个
+- 模型类型: 全部为LORA模型
+- 作者数量: 6位不同作者
+- 数据来源: MCP浏览器观察
 ```
 
 ### 环境变量

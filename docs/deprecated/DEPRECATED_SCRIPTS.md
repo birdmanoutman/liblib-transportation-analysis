@@ -112,7 +112,7 @@ python liblib_car_analyzer.py --all
 ```bash
 # 1. 备份重要数据
 mkdir backup_old_scripts
-cp *.py backup_old_scripts/
+cp *.py backup_old_src/
 
 # 2. 测试新版本
 python liblib_car_analyzer.py --all --output test_run

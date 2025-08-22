@@ -16,7 +16,7 @@ test-integration:
 	pytest -m integration -v --tb=short
 
 coverage:
-	pytest -v --tb=short --cov=scripts --cov-report=term-missing --cov-report=html:htmlcov
+	pytest -v --tb=short --cov=src --cov-report=term-missing --cov-report=html:build/htmlcov
 
 lint:
 	ruff check .
@@ -29,13 +29,13 @@ format:
 	isort .
 
 type-check:
-	mypy scripts tests
+	mypy src tests
 
 pre-commit-install:
 	pre-commit install
 
 clean:
 	find . -name "__pycache__" -type d -exec rm -rf {} +
-	rm -rf .pytest_cache .mypy_cache .ruff_cache htmlcov .coverage* build dist
+	rm -rf temp/.pytest_cache .mypy_cache .ruff_cache build/htmlcov build/.coverage* build dist
 
 

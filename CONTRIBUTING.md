@@ -24,7 +24,7 @@ pre-commit install
 
 - Python 3.9+ target.
 - Black formatting, Ruff linting (including isort), Mypy type-checking.
-- Avoid breaking public CLI flags in `scripts/` without deprecation notes.
+- Avoid breaking public CLI flags in `src/` without deprecation notes.
 
 #### Tests
 

@@ -154,35 +154,35 @@ t8.stop_service()
 #### 演示模式
 ```bash
 # 开发环境演示
-python scripts/scraping/run_t8_resume_retry.py --env development --mode demo
+python src/scraping/run_t8_resume_retry.py --env development --mode demo
 
 # 生产环境演示
-python scripts/scraping/run_t8_resume_retry.py --env production --mode demo
+python src/scraping/run_t8_resume_retry.py --env production --mode demo
 ```
 
 #### 集成测试
 ```bash
 # 运行集成测试
-python scripts/scraping/run_t8_resume_retry.py --env testing --mode test
+python src/scraping/run_t8_resume_retry.py --env testing --mode test
 
 # 指定日志级别
-python scripts/scraping/run_t8_resume_retry.py --env testing --mode test --log-level DEBUG
+python src/scraping/run_t8_resume_retry.py --env testing --mode test --log-level DEBUG
 ```
 
 #### 配置查看
 ```bash
 # 查看配置
-python scripts/scraping/run_t8_resume_retry.py --mode config
+python src/scraping/run_t8_resume_retry.py --mode config
 
 # 查看特定环境配置
-python scripts/scraping/run_t8_resume_retry.py --env production --mode config
+python src/scraping/run_t8_resume_retry.py --env production --mode config
 ```
 
 ### 3. 与T4/T5集成
 
 #### 在T4列表采集器中使用
 ```python
-from scripts.scraping.t8_resume_and_retry import T8ResumeAndRetry
+from src.scraping.t8_resume_and_retry import T8ResumeAndRetry
 
 class T4ListCollector:
     def __init__(self, config):
@@ -385,7 +385,7 @@ tail -f logs/t8_resume_retry.log
 python -c "from scripts.database.database_manager import DatabaseManager; print('DB OK')"
 
 # 手动验证数据
-python scripts/scraping/run_t8_resume_retry.py --mode test --log-level DEBUG
+python src/scraping/run_t8_resume_retry.py --mode test --log-level DEBUG
 ```
 
 ### 调试模式
@@ -394,7 +394,7 @@ python scripts/scraping/run_t8_resume_retry.py --mode test --log-level DEBUG
 export T8_LOG_LEVEL=DEBUG
 
 # 运行调试模式
-python scripts/scraping/run_t8_resume_retry.py --env development --mode demo --log-level DEBUG
+python src/scraping/run_t8_resume_retry.py --env development --mode demo --log-level DEBUG
 ```
 
 ## 性能优化

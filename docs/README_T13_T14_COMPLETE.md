@@ -22,7 +22,7 @@
 
 ```
 liblib-transportation-analysis/
-├── 📁 scripts/                    # 脚本文件
+├── 📁 src/                        # 脚本文件
 │   ├── 📁 analysis/              # 数据分析脚本
 │   │   └── database_analysis_pipeline.py  # 🆕 数据库分析流水线
 │   ├── 📁 scraping/              # 数据采集脚本
@@ -119,7 +119,7 @@ python save_and_analyze_collected_data.py
 python run_complete_analysis.py --mode database
 
 # 或直接运行
-python scripts/analysis/database_analysis_pipeline.py
+python src/analysis/database_analysis_pipeline.py
 ```
 
 #### 3. 一键运行（推荐）
@@ -150,7 +150,7 @@ class ComprehensiveCarAnalyzer:
 #### 2. 数据库连接配置
 
 ```python
-# 在 scripts/database/database_manager.py 中修改
+# 在 src/database/database_manager.py 中修改
 class DatabaseManager:
     def __init__(self):
         self.db_config = {
@@ -235,7 +235,7 @@ FLUSH PRIVILEGES;
 
 ```bash
 # 运行SQL脚本
-mysql -u your_username -p cardesignspace < scripts/database/create_tables.sql
+mysql -u your_username -p cardesignspace < src/database/create_tables.sql
 ```
 
 #### 3. 环境变量配置
