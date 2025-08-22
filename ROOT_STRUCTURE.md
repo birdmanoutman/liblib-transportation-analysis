@@ -30,7 +30,7 @@ liblib-transportation-analysis/
 │   ├── pytest.ini           # 测试配置
 │   ├── .pre-commit-config.yaml # 代码质量配置
 │   └── pyproject.toml        # 项目配置
-├── 📁 src/                    # 脚本文件目录
+├── 📁 src/                    # 核心代码目录
 │   ├── check_database_status.py # 数据库状态检查
 │   └── run_complete_analysis.py # 完整分析运行脚本
 ├── 📁 build/                 # 构建输出目录
