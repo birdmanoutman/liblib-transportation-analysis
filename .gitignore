@@ -272,3 +272,6 @@ personal_config.py
 
 *archive/*
 archive/
+car_models_complete/
+data/
+data/*

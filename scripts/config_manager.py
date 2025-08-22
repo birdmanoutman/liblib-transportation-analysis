@@ -65,6 +65,8 @@ class ConfigManager:
         
         # 应用环境变量覆盖
         self._apply_environment_overrides()
+        # 同步扁平派生键，确保覆盖后也生效
+        self._sync_derived_keys()
         
         return self.config_data
 
@@ -84,6 +86,22 @@ class ConfigManager:
         if not result.get("car_keywords"):
             result["car_keywords"] = result.get("tags", {}).get("enabled", [])
         return result
+
+    def _sync_derived_keys(self) -> None:
+        """从嵌套配置同步生成 Analyzer 使用的扁平键。"""
+        api = self.config_data.get("api", {}) or {}
+        scraping = self.config_data.get("scraping", {}) or {}
+        tags = self.config_data.get("tags", {}) or {}
+        if api.get("base_url"):
+            self.config_data["api_base"] = api.get("base_url")
+        if not self.config_data.get("base_url"):
+            self.config_data["base_url"] = "https://www.liblib.art"
+        if scraping.get("page_size") and not self.config_data.get("page_size"):
+            self.config_data["page_size"] = scraping.get("page_size")
+        if scraping.get("max_workers") and not self.config_data.get("max_workers"):
+            self.config_data["max_workers"] = scraping.get("max_workers")
+        if not self.config_data.get("car_keywords"):
+            self.config_data["car_keywords"] = tags.get("enabled", [])
     
     def _find_config_file(self) -> Optional[str]:
         """查找配置文件

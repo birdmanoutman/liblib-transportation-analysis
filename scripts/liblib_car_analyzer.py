@@ -235,10 +235,19 @@ class LiblibCarModelsAnalyzer:
         if response:
             try:
                 data = response.json()
-                if data.get('data', {}).get('list'):
-                    return data['data']['list']
+                if isinstance(data, dict):
+                    data_field = data.get('data')
+                    if isinstance(data_field, dict):
+                        models_list = data_field.get('list')
+                        if isinstance(models_list, list):
+                            return models_list
+                    self.logger.warning("API响应缺少期望字段 data.list 或类型不符")
+                else:
+                    self.logger.warning("API响应非JSON对象，已忽略")
             except json.JSONDecodeError:
                 self.logger.error("响应JSON解析失败")
+            except Exception as e:
+                self.logger.error(f"响应处理异常: {e}")
         
         return []
     
@@ -369,10 +378,19 @@ class LiblibCarModelsAnalyzer:
         if response:
             try:
                 data = response.json()
-                if data.get('data', {}).get('list'):
-                    return data['data']['list']
+                if isinstance(data, dict):
+                    data_field = data.get('data')
+                    if isinstance(data_field, dict):
+                        models_list = data_field.get('list')
+                        if isinstance(models_list, list):
+                            return models_list
+                    self.logger.warning("搜索响应缺少期望字段 data.list 或类型不符")
+                else:
+                    self.logger.warning("搜索响应非JSON对象，已忽略")
             except json.JSONDecodeError:
                 self.logger.error("搜索响应JSON解析失败")
+            except Exception as e:
+                self.logger.error(f"搜索响应处理异常: {e}")
         
         return []
     
@@ -433,10 +451,17 @@ class LiblibCarModelsAnalyzer:
         if response:
             try:
                 data = response.json()
-                if data.get('data'):
-                    return data['data']
+                if isinstance(data, dict):
+                    data_field = data.get('data')
+                    if isinstance(data_field, dict):
+                        return data_field
+                    self.logger.warning("详情响应缺少期望字段 data 或类型不符")
+                else:
+                    self.logger.warning("详情响应非JSON对象，已忽略")
             except json.JSONDecodeError:
                 self.logger.error("模型详情JSON解析失败")
+            except Exception as e:
+                self.logger.error(f"详情响应处理异常: {e}")
         
         return None
     
