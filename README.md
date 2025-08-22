@@ -45,17 +45,41 @@ liblib-transportation-analysis/
 
 ### 环境要求
 
-- Python 3.7+
+- Python 3.9+
 - 网络连接（用于数据采集）
 
 ### 安装依赖
 
 ```bash
-# 安装核心依赖
-pip install requests pandas numpy
+# 推荐：使用虚拟环境
+python -m venv .venv && source .venv/bin/activate
 
-# 可选：安装Playwright（浏览器自动化）
-pip install playwright && playwright install
+# 一次性安装项目、测试、开发依赖
+make install-dev
+
+# 安装 pre-commit 钩子（首次）
+make pre-commit-install
+```
+
+### 常用命令
+
+```bash
+# 运行全部测试
+make test
+
+# 单元测试/集成测试
+make test-unit
+make test-integration
+
+# 覆盖率报告（生成 htmlcov/）
+make coverage
+
+# 代码格式化 & 静态检查
+make format
+make lint
+
+# 类型检查
+make type-check
 ```
 
 ### 基本使用
@@ -77,12 +101,9 @@ python scripts/liblib_car_analyzer.py --analyze
 python scripts/liblib_car_analyzer.py --help
 ```
 
-### 运行测试
+### 环境变量
 
-```bash
-# 运行测试套件
-python tests/unit/test_liblib_analyzer.py
-```
+- 复制并修改 `.env.example` 为 `.env`，详见 `docs/ENVIRONMENT.md`。
 
 ## 📊 核心功能
 
@@ -178,58 +199,4 @@ python tests/unit/test_liblib_analyzer.py
 | `complete_car_scraper.py` | API采集 | `--api` |
 | `enhanced_car_scraper.py` | 关键词搜索 | `--enhanced` |
 | `playwright_car_scraper.py` | 浏览器自动化 | `--browser` |
-| `download_all_images.py` | 图片下载 | `--download-images` |
-| `analyze_complete_models.py` | 数据分析 | `--analyze` |
-
-📖 **详细迁移指南**: 查看 [DEPRECATED_SCRIPTS.md](docs/deprecated/DEPRECATED_SCRIPTS.md)
-
-## 🤝 贡献指南
-
-我们欢迎社区贡献！请遵循以下步骤：
-
-1. Fork 本项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
-
-### 开发环境设置
-
-```bash
-# 克隆项目
-git clone https://github.com/yourusername/liblib-transportation-analysis.git
-cd liblib-transportation-analysis
-
-# 安装开发依赖
-pip install -r requirements-dev.txt
-
-# 运行测试
-python tests/unit/test_liblib_analyzer.py
-```
-
-## 📄 许可证
-
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
-## 🙏 致谢
-
-- 感谢 [Liblib.art](https://liblib.art) 提供数据源
-- 感谢所有贡献者的辛勤工作
-- 感谢开源社区的支持
-
-## 📞 联系我们
-
-- 🐛 **问题反馈**: [GitHub Issues](https://github.com/yourusername/liblib-transportation-analysis/issues)
-- 💬 **讨论交流**: [GitHub Discussions](https://github.com/yourusername/liblib-transportation-analysis/discussions)
-- 📧 **邮件联系**: your.email@example.com
-
-## 🎉 项目状态
-
-- **版本**: v1.0.0
-- **状态**: 🚀 生产就绪
-- **维护**: 活跃维护中
-- **测试**: 100%通过率 ✅
-
----
-
-⭐ **如果这个项目对您有帮助，请给我们一个星标！**
+| `download_all_images.py`
