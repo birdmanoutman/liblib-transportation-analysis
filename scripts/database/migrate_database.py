@@ -88,8 +88,25 @@ class DatabaseMigrator:
             with open(ddl_file, 'r', encoding='utf-8') as f:
                 ddl_script = f.read()
             
-            # 分割SQL语句
-            statements = [stmt.strip() for stmt in ddl_script.split(';') if stmt.strip()]
+            # 分割SQL语句 - 改进的分割逻辑
+            statements = []
+            current_statement = ""
+            
+            for line in ddl_script.split('\n'):
+                line = line.strip()
+                if line.startswith('--') or not line:  # 跳过注释和空行
+                    continue
+                
+                current_statement += line + " "
+                
+                if line.endswith(';'):
+                    # 完整的SQL语句
+                    statements.append(current_statement.strip())
+                    current_statement = ""
+            
+            # 添加最后一个语句（如果没有分号结尾）
+            if current_statement.strip():
+                statements.append(current_statement.strip())
             
             cursor = self.connection.cursor()
             
@@ -123,8 +140,8 @@ class DatabaseMigrator:
             
             # 检查表是否存在
             expected_tables = [
-                'authors', 'works', 'work_models', 'work_images', 
-                'comments', 'fetch_runs', 'fetch_queue'
+                'liblib_authors', 'liblib_works', 'liblib_work_models', 'liblib_work_images', 
+                'liblib_comments', 'liblib_fetch_runs', 'liblib_fetch_queue'
             ]
             
             cursor.execute("SHOW TABLES")

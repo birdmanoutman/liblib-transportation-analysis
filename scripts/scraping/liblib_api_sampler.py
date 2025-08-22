@@ -98,19 +98,31 @@ def default_list_payload(page: int = 1, page_size: int = 24) -> Dict[str, Any]:
 
 
 def extract_slugs_from_list(list_json: Dict[str, Any]) -> List[str]:
-    data = list_json or {}
-    items: List[Dict[str, Any]] = (
-        ((data.get("data") or {}).get("list") or [])
-        if isinstance(data.get("data"), dict)
-        else []
-    )
+    data_root = list_json or {}
+    data_obj = data_root.get("data") if isinstance(data_root, dict) else None
+    items: List[Dict[str, Any]] = []
+    if isinstance(data_obj, dict):
+        # Prefer data.data (array) when present; fallback to data.list
+        if isinstance(data_obj.get("data"), list):
+            items = data_obj.get("data") or []
+        elif isinstance(data_obj.get("list"), list):
+            items = data_obj.get("list") or []
+
     slugs: List[str] = []
     for item in items:
         if not isinstance(item, dict):
             continue
-        slug = item.get("slug") or item.get("id") or item.get("groupSlug")
-        if isinstance(slug, str):
-            slugs.append(slug)
+        # Use uuid first; fallback to any available identifier
+        slug = (
+            item.get("uuid")
+            or item.get("groupSlug")
+            or item.get("slug")
+            or item.get("id")
+        )
+        if slug is None:
+            continue
+        # Coerce to string to avoid numeric IDs
+        slugs.append(str(slug))
     return slugs
 
 
@@ -150,8 +162,11 @@ def fetch_list_pages(
             message = resp_json.get("message") or resp_json.get("msg")
             data_obj = resp_json.get("data") if isinstance(resp_json, dict) else None
             list_len = 0
-            if isinstance(data_obj, dict) and isinstance(data_obj.get("list"), list):
-                list_len = len(data_obj.get("list"))
+            if isinstance(data_obj, dict):
+                if isinstance(data_obj.get("data"), list):
+                    list_len = len(data_obj.get("data"))
+                elif isinstance(data_obj.get("list"), list):
+                    list_len = len(data_obj.get("list"))
             print(f"List page {page}: code={code}, message={message}, items={list_len}")
         except Exception:
             pass
@@ -186,18 +201,31 @@ def fetch_details(
         if count >= max_details:
             break
 
-        detail_url = f"{LIBLIB_API_BASE}/api/www/img/group/get/{slug}"
-        author_url = f"{LIBLIB_API_BASE}/api/www/img/author/{slug}?timestamp={now_ts}"
         now_ts = int(time.time() * 1000)
+        detail_url = f"{LIBLIB_API_BASE}/api/www/img/group/get/{slug}?timestamp={now_ts}"
         detail_json = safe_post(session, detail_url, {"timestamp": now_ts})
-        author_json = safe_post(session, author_url, None)
+
+        # Try to resolve author by userUuid from detail response, if present
+        author_json = None
+        author_user_uuid: Optional[str] = None
+        try:
+            if isinstance(detail_json, dict):
+                data_obj = detail_json.get("data")
+                if isinstance(data_obj, dict):
+                    author_user_uuid = data_obj.get("userUuid") or data_obj.get("authorUuid")
+        except Exception:
+            author_user_uuid = None
+
+        if author_user_uuid:
+            author_url = f"{LIBLIB_API_BASE}/api/www/img/author/{author_user_uuid}?timestamp={now_ts}"
+            author_json = safe_post(session, author_url, None)
 
         if detail_json is None and author_json is None:
             print(f"WARN: skip slug {slug}, both detail and author failed")
             continue
 
         detail_path = os.path.join(out_dir, f"detail_{slug}.json")
-        author_path = os.path.join(out_dir, f"author_{slug}.json")
+        author_path = os.path.join(out_dir, f"author_{author_user_uuid or slug}.json")
         if detail_json is not None:
             save_json(detail_json, detail_path)
         if author_json is not None:

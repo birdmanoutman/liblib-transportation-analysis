@@ -44,8 +44,8 @@ def verify_tables():
             
             # 我们需要的表
             required_tables = [
-                'authors', 'works', 'work_models', 'work_images', 
-                'comments', 'fetch_runs', 'fetch_queue'
+                'liblib_authors', 'liblib_works', 'liblib_work_models', 'liblib_work_images', 
+                'liblib_comments', 'liblib_fetch_runs', 'liblib_fetch_queue'
             ]
             
             # 检查表是否存在

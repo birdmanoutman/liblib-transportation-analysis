@@ -1,0 +1,19 @@
+# T6 媒体下载器依赖包
+# 核心依赖
+boto3>=1.26.0                    # AWS S3 SDK，支持MinIO
+botocore>=1.29.0                 # boto3核心库
+mysql-connector-python>=8.0.0    # MySQL数据库连接器
+python-dotenv>=1.0.0             # 环境变量管理
+requests>=2.28.0                 # HTTP请求库
+
+# 可选依赖（用于增强功能）
+Pillow>=9.0.0                    # 图片处理（可选）
+aiohttp>=3.8.0                   # 异步HTTP（可选）
+asyncio-throttle>=1.0.0          # 异步限速（可选）
+
+# 开发依赖
+pytest>=7.0.0                    # 测试框架
+pytest-asyncio>=0.21.0           # 异步测试支持
+pytest-cov>=4.0.0                # 测试覆盖率
+black>=22.0.0                    # 代码格式化
+flake8>=5.0.0                    # 代码检查
