@@ -16,8 +16,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from scripts.scraping.t8_resume_and_retry import T8ResumeAndRetry
-from scripts.scraping.t8_config import get_config, validate_config, print_config
+from t8_resume_and_retry import T8ResumeAndRetry
+from t8_config import get_config, validate_config, print_config
 
 def setup_logging(log_level: str = 'INFO', log_file: str = 'logs/t8_resume_retry.log'):
     """设置日志"""

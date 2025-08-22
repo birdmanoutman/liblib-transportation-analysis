@@ -1,0 +1,47 @@
+{
+  "api": {
+    "base_url": "https://api2.liblib.art",
+    "timeout": 30,
+    "retry_times": 3,
+    "retry_delay": 2
+  },
+  "scraping": {
+    "page_size": 48,
+    "max_pages": 10,
+    "delay_between_pages": 1,
+    "max_workers": 4
+  },
+  "tags": {
+    "enabled": ["汽车", "车", "跑车", "超跑", "轿车", "SUV"],
+    "disabled": [],
+    "custom_keywords": []
+  },
+  "sorting": {
+    "field": "downloads",
+    "order": "desc",
+    "available_fields": ["downloads", "likes", "created_at", "updated_at", "name"]
+  },
+  "download": {
+    "concurrent_downloads": 5,
+    "image_formats": ["jpg", "png", "webp"],
+    "retry_times": 3,
+    "skip_existing": true
+  },
+  "storage": {
+    "output_dir": "liblib_analysis_output",
+    "images_dir": "images",
+    "data_dir": "data",
+    "reports_dir": "reports",
+    "logs_dir": "logs"
+  },
+  "analysis": {
+    "include_charts": true,
+    "report_format": "markdown",
+    "language": "zh"
+  },
+  "logging": {
+    "level": "INFO",
+    "file_logging": true,
+    "console_logging": true
+  }
+}

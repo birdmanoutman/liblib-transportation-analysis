@@ -4,23 +4,31 @@ Maps Liblib API fields to DB schema (see `docs/PRD_transportation_scraper.md`). 
 
 #### List: img/group/search → works
 
-| API field (likely) | Type | DB column | Notes |
+- Items come under `data.data` (array). Use `uuid` as the work identifier.
+
+| API field | Type | DB column | Notes |
 |---|---|---|---|
-| slug | string | `works.slug` | Unique per work |
-| title | string | `works.title` | |
-| publishTime / createdAt | datetime | `works.published_at` | parse to UTC |
-| tags | array | `works.tags_json` | store as JSON |
+| uuid | string | `works.uuid` | Primary external ID |
+| title | string | `works.title` | may be empty |
+| createTime | datetime | `works.created_at` | to UTC |
+| auditTime / updateTime | datetime | `works.updated_at` | to UTC |
+| width | int | `works.width` | |
+| height | int | `works.height` | |
 | likeCount | int | `works.like_count` | |
-| favoriteCount | int | `works.favorite_count` | |
 | commentCount | int | `works.comment_count` | |
-| author.nickName | string | join via `authors.name` | resolved in detail/author API |
-| author.id | string | `authors.external_author_id` | via detail/author API |
+| tagsId | array<int> | `works.tags_id_json` | store as JSON |
+| tagsLabel | string | `works.tags_label` | |
+| userUuid | string | `authors.external_author_id` | join key to authors |
+| nickname | string | `authors.name` | denormalize or via authors table |
+| avatar | string | `authors.avatar_url` | denormalize or via authors table |
+| imageUrl | string | `work_images.src_url` | first image |
+| imageSource | int | `works.image_source` | raw enum/int |
 
-#### Detail: img/group/get/{slug} → works, work_models, work_images
+#### Detail: img/group/get/{uuid} → works, work_models, work_images
 
-| API field (likely) | Type | DB column | Notes |
+| API field | Type | DB column | Notes |
 |---|---|---|---|
-| slug | string | `works.slug` | |
+| uuid | string | `works.uuid` | |
 | title | string | `works.title` | |
 | prompt | string | `works.prompt` | |
 | negativePrompt | string | `works.negative_prompt` | |
@@ -37,11 +45,11 @@ Maps Liblib API fields to DB schema (see `docs/PRD_transportation_scraper.md`). 
 | models[].name | string | `work_models.model_name` | for referenced models |
 | models[].type | enum | `work_models.model_type` | map to CHECKPOINT/LORA/OTHER |
 
-#### Author: img/author/{slug} → authors
+#### Author: img/author/{userUuid} → authors
 
-| API field (likely) | Type | DB column | Notes |
+| API field | Type | DB column | Notes |
 |---|---|---|---|
-| id | string | `authors.external_author_id` | |
+| id (userUuid) | string | `authors.external_author_id` | |
 | nickName | string | `authors.name` | |
 | avatar | string | `authors.avatar_url` | |
 | profileUrl | string | `authors.profile_url` | |

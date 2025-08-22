@@ -3,8 +3,8 @@
 - **Goal**: Archive 3 list pages and 10 details JSON for the Transportation (汽车交通) category to support downstream schema design and parser contracts.
 - **Outputs**:
   - `data/raw/liblib/samples/lists/list_page_{1..3}.json`
-  - `data/raw/liblib/samples/details/detail_{slug}.json`
-  - `data/raw/liblib/samples/details/author_{slug}.json`
+  - `data/raw/liblib/samples/details/detail_{uuid}.json`
+  - `data/raw/liblib/samples/details/author_{userUuid|uuid}.json`
 
 ### How to run
 
@@ -26,17 +26,23 @@ python scripts/scraping/liblib_api_sampler.py \
   --max-details 10
 ```
 
-Example payload structure (adjust to match production):
+Example payload structure (captured from production – 汽车交通 tag):
 
 ```json
-{
-  "page": 1,
-  "pageSize": 30,
-  "sortType": "hot",
-  "tagNames": ["汽车交通"],
-  "nsfw": false,
-  "keyword": ""
-}
+{"cid":"<cid>",
+ "requestId":"<uuid>",
+ "page":1,
+ "pageSize":30,
+ "sort":0,
+ "followed":0,
+ "resolution":0,
+ "tagId":1773,
+ "types":[],
+ "createTools":[],
+ "imageFuncs":[],
+ "liked":0,
+ "imageSources":[],
+ "imageCapability":[]}
 ```
 
 ### Notes

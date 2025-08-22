@@ -1,0 +1,31 @@
+# 测试依赖包
+# 用于T11单元测试执行
+
+# 测试框架
+pytest>=6.0.0
+pytest-cov>=2.10.0
+pytest-asyncio>=0.14.0
+pytest-mock>=3.6.0
+pytest-timeout>=1.4.0
+
+# 覆盖率工具
+coverage>=5.0.0
+
+# 模拟和测试工具
+freezegun>=1.1.0
+
+# 数据验证测试
+jsonschema>=3.2.0
+
+# 网络测试
+responses>=0.12.0
+httpretty>=1.1.0
+
+# 环境变量测试
+pytest-env>=0.6.0
+
+# 并行测试
+pytest-xdist>=2.0.0
+
+# 报告生成
+pytest-html>=2.1.0

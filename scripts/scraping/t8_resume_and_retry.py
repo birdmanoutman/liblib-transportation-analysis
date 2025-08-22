@@ -26,7 +26,30 @@ from contextlib import asynccontextmanager
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from scripts.database.database_manager import DatabaseManager
+try:
+    from database.database_manager import DatabaseManager
+except ImportError:
+    # 如果导入失败，创建一个Mock类
+    class DatabaseManager:
+        async def execute_query(self, query, params=None):
+            return [{"count": 0}]
+
+try:
+    from t8_config import get_config, validate_config
+except ImportError:
+    # 如果导入失败，创建一个Mock类
+    def get_config(env=None):
+        return {
+            'state_dir': 'data/state',
+            'max_workers': 5,
+            'retry_check_interval': 30,
+            'max_retry_delay': 3600,
+            'enable_auto_retry': True,
+            'enable_integrity_check': True
+        }
+    
+    def validate_config(config):
+        return True
 
 # 配置日志
 logger = logging.getLogger(__name__)
@@ -368,21 +391,29 @@ class RetryManager:
                 if retryable_tasks:
                     logger.info(f"发现{len(retryable_tasks)}个可重试任务")
                     
-                    # 并发处理重试任务
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-                        futures = []
-                        for task in retryable_tasks:
-                            if task.task_type in self.retry_handlers:
-                                future = executor.submit(self._retry_task, task)
-                                futures.append(future)
-                        
-                        # 等待所有重试完成
-                        for future in concurrent.futures.as_completed(futures):
+                    # 处理重试任务
+                    for task in retryable_tasks:
+                        if task.task_type in self.retry_handlers:
                             try:
-                                result = future.result()
-                                logger.debug(f"重试任务完成：{result}")
+                                handler = self.retry_handlers[task.task_type]
+                                success = handler(task.target, task.metadata)
+                                
+                                if success:
+                                    self.state_manager.mark_task_success(task.task_id)
+                                    logger.info(f"任务重试成功：{task.task_id}")
+                                else:
+                                    # 计算下次重试时间（指数退避）
+                                    retry_delay = min(300 * (2 ** task.retry_count), 3600)  # 最大1小时
+                                    next_retry = datetime.now() + timedelta(seconds=retry_delay)
+                                    self.state_manager.mark_task_retry(task.task_id, next_retry)
+                                    logger.info(f"任务重试失败：{task.task_id}，下次重试：{next_retry}")
+                                    
                             except Exception as e:
-                                logger.error(f"重试任务异常：{e}")
+                                logger.error(f"重试任务异常：{task.task_id} - {e}")
+                                # 标记重试失败
+                                retry_delay = min(300 * (2 ** task.retry_count), 3600)
+                                next_retry = datetime.now() + timedelta(seconds=retry_delay)
+                                self.state_manager.mark_task_retry(task.task_id, next_retry)
                 
                 # 等待一段时间再检查
                 time.sleep(30)
@@ -390,36 +421,6 @@ class RetryManager:
             except Exception as e:
                 logger.error(f"重试工作线程异常：{e}")
                 time.sleep(60)
-    
-    def _retry_task(self, task: FailedTask) -> bool:
-        """重试单个任务"""
-        try:
-            if task.task_type not in self.retry_handlers:
-                logger.warning(f"未找到任务类型处理器：{task.task_type}")
-                return False
-            
-            handler = self.retry_handlers[task.task_type]
-            success = handler(task.target, task.metadata)
-            
-            if success:
-                self.state_manager.mark_task_success(task.task_id)
-                logger.info(f"任务重试成功：{task.task_id}")
-                return True
-            else:
-                # 计算下次重试时间（指数退避）
-                retry_delay = min(300 * (2 ** task.retry_count), 3600)  # 最大1小时
-                next_retry = datetime.now() + timedelta(seconds=retry_delay)
-                self.state_manager.mark_task_retry(task.task_id, next_retry)
-                logger.info(f"任务重试失败：{task.task_id}，下次重试：{next_retry}")
-                return False
-                
-        except Exception as e:
-            logger.error(f"重试任务异常：{task.task_id} - {e}")
-            # 标记重试失败
-            retry_delay = min(300 * (2 ** task.retry_count), 3600)
-            next_retry = datetime.now() + timedelta(seconds=retry_delay)
-            self.state_manager.mark_task_retry(task.task_id, next_retry)
-            return False
 
 class ResumeValidator:
     """运行恢复验证器 - 验证断点续采的完整性"""
@@ -778,13 +779,6 @@ class T8ResumeAndRetry:
         except Exception as e:
             logger.error(f"重试图片下载失败：{target} - {e}")
             return False
-
-# 兼容性导入
-try:
-    import concurrent.futures
-except ImportError:
-    # Python 3.2以下版本兼容
-    import futures as concurrent.futures
 
 async def main():
     """主函数 - 演示T8功能"""

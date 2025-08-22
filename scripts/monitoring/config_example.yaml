@@ -1,0 +1,175 @@
+# Liblib 交通数据采集监控系统配置文件示例
+# 复制此文件为 config.yaml 并根据需要修改
+
+# 系统基本信息
+system:
+  name: "liblib_transportation"
+  version: "1.0.0"
+  description: "Liblib交通数据采集监控系统"
+
+# 日志配置
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  console_output: true
+  file_output: true
+  log_file: "logs/liblib_transportation.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+  include_system_info: false
+
+# 指标收集配置
+metrics:
+  max_history: 1000
+  enable_system_monitoring: true
+  system_monitoring_interval: 30  # 秒
+  export_formats: ["json", "excel", "txt"]
+
+# 告警配置
+alerts:
+  # 告警规则配置
+  rules:
+    - name: "高错误率"
+      metric_name: "error_rate_percent"
+      threshold: 10.0
+      operator: ">"
+      level: "warning"
+      duration: 0
+      cooldown: 300
+      description: "错误率超过10%"
+      enabled: true
+    
+    - name: "低成功率"
+      metric_name: "success_rate_percent"
+      threshold: 90.0
+      operator: "<"
+      level: "warning"
+      duration: 0
+      cooldown: 300
+      description: "成功率低于90%"
+      enabled: true
+    
+    - name: "高响应时间"
+      metric_name: "avg_request_time_seconds"
+      threshold: 5.0
+      operator: ">"
+      level: "warning"
+      duration: 0
+      cooldown: 300
+      description: "平均响应时间超过5秒"
+      enabled: true
+    
+    - name: "系统资源紧张"
+      metric_name: "cpu_percent"
+      threshold: 80.0
+      operator: ">"
+      level: "warning"
+      duration: 60
+      cooldown: 300
+      description: "CPU使用率持续超过80%"
+      enabled: true
+    
+    - name: "磁盘空间不足"
+      metric_name: "disk_usage"
+      threshold: 90.0
+      operator: ">"
+      level: "critical"
+      duration: 0
+      cooldown: 600
+      description: "磁盘使用率超过90%"
+      enabled: true
+    
+    - name: "内存使用率高"
+      metric_name: "memory_percent"
+      threshold: 85.0
+      operator: ">"
+      level: "warning"
+      duration: 30
+      cooldown: 300
+      description: "内存使用率持续超过85%"
+      enabled: true
+
+  # 告警通道配置
+  channels:
+    console:
+      enabled: true
+      level: "info"  # 最小告警级别
+    
+    file:
+      enabled: true
+      file_path: "data/monitoring/alerts.log"
+      level: "warning"
+    
+    # 邮件告警（预留接口）
+    email:
+      enabled: false
+      smtp_server: "smtp.example.com"
+      smtp_port: 587
+      username: "alert@example.com"
+      password: "your_password"
+      recipients: ["admin@example.com", "ops@example.com"]
+      level: "critical"
+    
+    # Webhook告警（预留接口）
+    webhook:
+      enabled: false
+      url: "https://api.example.com/webhook"
+      headers:
+        Authorization: "Bearer your_token"
+      level: "critical"
+
+# 数据导出配置
+export:
+  default_directory: "data/monitoring/exports"
+  include_logs: true
+  include_metrics: true
+  include_alerts: true
+  auto_export: false
+  export_interval: 3600  # 秒，仅在auto_export为true时生效
+
+# 爬虫特定监控配置
+scraping:
+  # 阶段定义
+  stages:
+    - name: "列表采集"
+      description: "采集页面列表数据"
+      success_threshold: 95.0  # 成功率阈值
+    
+    - name: "详情采集"
+      description: "采集详细数据"
+      success_threshold: 90.0
+    
+    - name: "媒体下载"
+      description: "下载图片和媒体文件"
+      success_threshold: 99.0
+    
+    - name: "数据处理"
+      description: "数据清洗和转换"
+      success_threshold: 98.0
+  
+  # 性能指标阈值
+  performance:
+    max_request_time: 10.0  # 最大请求时间（秒）
+    max_concurrent_requests: 50  # 最大并发请求数
+    min_success_rate: 85.0  # 最小成功率（%）
+    max_error_rate: 15.0  # 最大错误率（%）
+
+# 系统资源监控配置
+system_monitoring:
+  enabled: true
+  check_interval: 30  # 秒
+  thresholds:
+    cpu_warning: 70.0
+    cpu_critical: 90.0
+    memory_warning: 75.0
+    memory_critical: 90.0
+    disk_warning: 80.0
+    disk_critical: 95.0
+    network_warning: 80.0
+    network_critical: 95.0
+
+# 开发环境配置
+development:
+  debug_mode: false
+  verbose_logging: false
+  mock_metrics: false
+  test_alerts: false

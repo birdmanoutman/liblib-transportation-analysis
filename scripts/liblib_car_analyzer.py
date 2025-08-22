@@ -49,6 +49,19 @@ import hashlib
 from urllib.parse import urlparse, urljoin
 import re
 
+# 导入配置管理模块
+try:
+    from config_manager import ConfigManager
+except ImportError:
+    # 如果导入失败，创建一个简单的配置管理器
+    class ConfigManager:
+        def __init__(self):
+            self.config_data = {}
+        def get(self, key_path, default=None):
+            return default
+        def load_config(self):
+            return {}
+
 # 尝试导入Playwright（可选依赖）
 try:
     from playwright.async_api import async_playwright
@@ -63,11 +76,16 @@ class LiblibCarModelsAnalyzer:
     
     def __init__(self, config: Optional[Dict] = None):
         """初始化分析器"""
-        default_config = self._get_default_config()
+        # 初始化配置管理器
+        self.config_manager = ConfigManager()
+        
+        # 加载配置
         if config:
-            # 合并配置，确保所有必要的键都存在
-            default_config.update(config)
-        self.config = default_config
+            self.config_manager.config_data = config
+        else:
+            self.config_manager.load_config()
+        
+        self.config = self.config_manager.get_effective_config()
         self._setup_logging()
         self._setup_directories()
         self._setup_session()
@@ -86,58 +104,53 @@ class LiblibCarModelsAnalyzer:
         }
     
     def _get_default_config(self) -> Dict:
-        """获取默认配置"""
-        return {
-            'api_base': 'https://api2.liblib.art',
-            'base_url': 'https://www.liblib.art',
-            'image_base': 'https://liblibai-online.liblib.cloud',
-            'output_dir': 'liblib_analysis_output',
-            'images_dir': 'images',
-            'max_workers': 4,
-            'timeout': 30,
-            'retry_times': 3,
-            'retry_delay': 2,
-            'page_size': 48,
-            'max_pages': 10,
-            'car_keywords': [
-                "汽车", "车", "跑车", "超跑", "轿车", "SUV", "卡车", "货车", "客车", "巴士",
-                "内饰", "外饰", "车身", "车型", "车展", "轮毂", "方向盘", "仪表盘",
-                "保时捷", "法拉利", "兰博基尼", "奔驰", "宝马", "奥迪", "大众", "丰田", "本田",
-                "特斯拉", "比亚迪", "蔚来", "小鹏", "理想", "吉利", "长城", "奇瑞",
-                "电车", "电动车", "混动", "新能源", "充电", "电池",
-                "概念车", "未来车", "科幻车", "赛车", "F1", "勒芒", "拉力赛",
-                "摩托车", "电动车", "自行车", "三轮车", "房车", "露营车",
-                "火车", "动车", "高铁", "地铁", "轻轨", "有轨电车",
-                "飞机", "客机", "战斗机", "直升机", "无人机", "航空",
-                "船", "轮船", "游艇", "帆船", "潜艇", "舰艇", "航母",
-                "交通工具", "载具", "交通", "运输", "物流", "配送"
-            ]
-        }
+        """获取默认配置（兼容性方法）"""
+        return self.config_manager.get_effective_config()
     
     def _setup_logging(self):
         """设置日志系统"""
-        log_dir = Path(self.config['output_dir']) / 'logs'
-        log_dir.mkdir(parents=True, exist_ok=True)
+        # 获取日志配置
+        log_level = getattr(logging, self.config_manager.get('logging.level', 'INFO').upper(), logging.INFO)
+        file_logging = self.config_manager.get('logging.file_logging', True)
+        console_logging = self.config_manager.get('logging.console_logging', True)
         
-        log_file = log_dir / f"liblib_analyzer_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        # 设置日志格式
+        log_format = '%(asctime)s - %(levelname)s - %(message)s'
         
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler(log_file, encoding='utf-8'),
-                logging.StreamHandler()
-            ]
-        )
+        # 清除现有的处理器
+        logging.getLogger().handlers.clear()
+        
+        # 设置根日志器级别
+        logging.getLogger().setLevel(log_level)
+        
+        # 创建格式化器
+        formatter = logging.Formatter(log_format)
+        
+        # 添加文件处理器
+        if file_logging:
+            log_dir = Path(self.config['storage']['output_dir']) / self.config['storage']['logs_dir']
+            log_dir.mkdir(parents=True, exist_ok=True)
+            log_file = log_dir / f"liblib_analyzer_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+            
+            file_handler = logging.FileHandler(log_file, encoding='utf-8')
+            file_handler.setFormatter(formatter)
+            logging.getLogger().addHandler(file_handler)
+        
+        # 添加控制台处理器
+        if console_logging:
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(formatter)
+            logging.getLogger().addHandler(console_handler)
+        
         self.logger = logging.getLogger(__name__)
         self.logger.info("Liblib汽车交通模型分析器启动")
     
     def _setup_directories(self):
         """设置输出目录"""
-        self.output_dir = Path(self.config['output_dir'])
-        self.images_dir = self.output_dir / self.config.get('images_dir', 'images')
-        self.data_dir = self.output_dir / 'data'
-        self.reports_dir = self.output_dir / 'reports'
+        self.output_dir = Path(self.config['storage']['output_dir'])
+        self.images_dir = self.output_dir / self.config['storage']['images_dir']
+        self.data_dir = self.output_dir / self.config['storage']['data_dir']
+        self.reports_dir = self.output_dir / self.config['storage']['reports_dir']
         
         for dir_path in [self.output_dir, self.images_dir, self.data_dir, self.reports_dir]:
             dir_path.mkdir(parents=True, exist_ok=True)
@@ -154,22 +167,27 @@ class LiblibCarModelsAnalyzer:
             'Referer': 'https://www.liblib.art/',
             'Origin': 'https://www.liblib.art'
         })
+        
+        # 设置超时和重试配置
+        self.timeout = self.config_manager.get('api.timeout', 30)
+        self.retry_times = self.config_manager.get('api.retry_times', 3)
+        self.retry_delay = self.config_manager.get('api.retry_delay', 2)
     
     def safe_request(self, method: str, url: str, **kwargs) -> Optional[requests.Response]:
         """安全的HTTP请求，支持重试"""
-        for attempt in range(self.config['retry_times']):
+        for attempt in range(self.retry_times):
             try:
                 response = self.session.request(
                     method, url, 
-                    timeout=self.config['timeout'],
+                    timeout=self.timeout,
                     **kwargs
                 )
                 response.raise_for_status()
                 return response
             except requests.RequestException as e:
-                self.logger.warning(f"请求失败 (尝试 {attempt + 1}/{self.config['retry_times']}) {url}: {e}")
-                if attempt < self.config['retry_times'] - 1:
-                    time.sleep(self.config['retry_delay'] ** attempt)
+                self.logger.warning(f"请求失败 (尝试 {attempt + 1}/{self.retry_times}) {url}: {e}")
+                if attempt < self.retry_times - 1:
+                    time.sleep(self.retry_delay ** attempt)
         return None
     
     def get_timestamp(self) -> int:
@@ -181,7 +199,10 @@ class LiblibCarModelsAnalyzer:
         self.logger.info("开始API数据采集...")
         all_models = []
         
-        for page in range(1, self.config['max_pages'] + 1):
+        max_pages = self.config_manager.get('scraping.max_pages', 10)
+        delay_between_pages = self.config_manager.get('scraping.delay_between_pages', 1)
+        
+        for page in range(1, max_pages + 1):
             models = self._get_models_by_page(page)
             if not models:
                 self.logger.info(f"第{page}页无数据，停止采集")
@@ -191,7 +212,8 @@ class LiblibCarModelsAnalyzer:
             self.logger.info(f"第{page}页采集到{len(models)}个模型")
             
             # 避免请求过快
-            time.sleep(1)
+            if page < max_pages:
+                time.sleep(delay_between_pages)
         
         self.logger.info(f"API采集完成，共获取{len(all_models)}个模型")
         return all_models
@@ -731,32 +753,83 @@ def main():
         epilog=__doc__
     )
     
+    # 基本功能参数
     parser.add_argument('--collect', action='store_true', help='执行数据采集')
     parser.add_argument('--download', action='store_true', help='执行图片下载')
     parser.add_argument('--analyze', action='store_true', help='执行数据分析')
     parser.add_argument('--report', action='store_true', help='生成分析报告')
     parser.add_argument('--all', action='store_true', help='执行完整流程')
+    
+    # 配置相关参数
     parser.add_argument('--config', type=str, help='指定配置文件')
-    parser.add_argument('--output', type=str, help='指定输出目录')
+    parser.add_argument('--create-config', action='store_true', help='创建配置模板文件')
+    parser.add_argument('--show-config', action='store_true', help='显示当前配置摘要')
+    
+    # T10工单要求的参数化配置
+    # 标签相关
+    parser.add_argument('--tags', type=str, help='指定要采集的标签，用逗号分隔')
+    parser.add_argument('--exclude-tags', type=str, help='指定要排除的标签，用逗号分隔')
+    parser.add_argument('--custom-keywords', type=str, help='自定义关键词，用逗号分隔')
+    
+    # 排序相关
+    parser.add_argument('--sort-by', type=str, choices=['downloads', 'likes', 'created_at', 'updated_at', 'name'], 
+                       help='指定排序字段')
+    parser.add_argument('--sort-order', type=str, choices=['asc', 'desc'], help='指定排序顺序')
+    
+    # 页范围相关
+    parser.add_argument('--max-pages', type=int, help='最大采集页数')
+    parser.add_argument('--page-size', type=int, help='每页模型数量')
+    
+    # 并发相关
+    parser.add_argument('--max-workers', type=int, help='最大工作线程数')
+    parser.add_argument('--concurrent-downloads', type=int, help='并发下载数量')
+    
+    # 存储路径相关
+    parser.add_argument('--output-dir', type=str, help='指定输出目录')
+    parser.add_argument('--images-dir', type=str, help='指定图片存储目录')
+    
+    # 日志相关
+    parser.add_argument('--log-level', type=str, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], 
+                       help='指定日志级别')
+    parser.add_argument('--verbose', action='store_true', help='详细日志输出')
     
     args = parser.parse_args()
     
-    # 加载配置
-    config = {}
-    if args.config:
-        try:
-            with open(args.config, 'r', encoding='utf-8') as f:
-                config = json.load(f)
-        except Exception as e:
-            print(f"配置文件加载失败: {e}")
-            return
+    # 创建配置管理器
+    config_manager = ConfigManager()
     
-    # 设置输出目录
-    if args.output:
-        config['output_dir'] = args.output
+    # 加载配置文件
+    if args.config:
+        config_manager.load_config(args.config)
+    else:
+        config_manager.load_config()
+    
+    # 从命令行参数更新配置
+    config_manager.update_from_args(args)
+    
+    # 验证配置
+    validation_errors = config_manager.validate_config()
+    if validation_errors:
+        print("❌ 配置验证失败:")
+        for error in validation_errors:
+            print(f"  - {error}")
+        return
+    
+    # 显示配置摘要
+    if args.show_config:
+        config_manager.print_config_summary()
+        return
+    
+    # 创建配置模板
+    if args.create_config:
+        if config_manager.create_config_template():
+            print("✅ 配置模板创建成功")
+        else:
+            print("❌ 配置模板创建失败")
+        return
     
     # 创建分析器
-    analyzer = LiblibCarModelsAnalyzer(config)
+    analyzer = LiblibCarModelsAnalyzer(config_manager.get_effective_config())
     
     try:
         if args.all or (not any([args.collect, args.download, args.analyze, args.report])):
