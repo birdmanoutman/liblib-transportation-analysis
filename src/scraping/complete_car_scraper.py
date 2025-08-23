@@ -660,6 +660,19 @@ class LiblibCarModelsScraper:
         
         return stats
 
+class CompleteCarModelScraper(LiblibCarModelsScraper):
+    def load_config(self) -> Dict[str, Any]:
+        """Return a minimal configuration dict expected by tests.
+        This keeps backward compatibility with older test imports.
+        """
+        return {
+            'api_base': self.api_base,
+            'output_dir': self.output_dir,
+            'images_dir': self.images_dir,
+            'default_page_size': 24,
+            'default_concurrency': 3,
+        }
+
 def main():
     """主函数"""
     scraper = LiblibCarModelsScraper()
