@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "security-audit": "npm audit --audit-level=moderate",
+    "security-scan": "npx eslint . --config .eslintrc.js --env node --rule 'security/detect-object-injection: error, security/detect-possible-timing-attacks: error'"
+  }
+}
