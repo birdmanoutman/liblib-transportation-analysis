@@ -1,0 +1,1 @@
+# Security Hardening Analysis\n\nBased on automated security scan results.\n\n## Findings\n\n[To be populated with security scan results]\n\n## Recommended Actions\n\n[To be populated with specific hardening recommendations]
